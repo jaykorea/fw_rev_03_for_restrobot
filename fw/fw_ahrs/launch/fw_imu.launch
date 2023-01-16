@@ -1,0 +1,4 @@
+<launch>
+  <node name="fw_ahrs_node" pkg="fw_ahrs"  type="fw_ahrs_node" output="screen">
+  </node>
+</launch>

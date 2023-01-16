@@ -1,0 +1,4 @@
+<launch>
+  <node name="freeway_mw_node" pkg="freeway_mw"  type="freeway_mw_node" output="screen">
+  </node>
+</launch>
