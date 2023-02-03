@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   move_base_msgs
   nav_msgs
+  sensor_msgs
   roscpp
   std_msgs
   tf2_geometry_msgs
@@ -56,6 +57,7 @@ find_package(catkin REQUIRED COMPONENTS
    FILES
    stm_fw_msg.msg
    stm_am_msg.msg
+   stm_fw_sonar_msg.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -74,7 +76,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate added messages and services with any dependencies listed here
  generate_messages(
    DEPENDENCIES
-   geometry_msgs   move_base_msgs   nav_msgs   std_msgs
+   geometry_msgs   move_base_msgs   nav_msgs   std_msgs sensor_msgs
  )
 
 ################################################
