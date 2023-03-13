@@ -12,8 +12,8 @@
         <param name = "halltype"         value = "30"/>
         <param name = "maxrpm"           value = "300"/>
         <param name = "angleresolution"  value = "1"/>
-        <param name = "slowstart"        value = "550"/>
-        <param name = "slowdown"         value = "200"/>
+        <param name = "slowstart"        value = "70"/>
+        <param name = "slowdown"         value = "25"/> <!-- 550 200 -->
     </node>
 
     <node pkg="md" type="vel_cmd_node" name="vel_cmd_node" output="screen" respawn="false">

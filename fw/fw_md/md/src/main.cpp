@@ -20,13 +20,16 @@
 #include "std_msgs/Empty.h"
 #include "std_msgs/Bool.h"
 
-#define signal_distance 0.15
-#define signal_release 0.5
+#define signal_distance 0.2
+#define signal_distance_teb 0.35
+#define signal_release 0.4
 
 #define SET_STOP_STATUS false
 
 int32_t signal_checker = 0;
+int32_t signal_checker_teb = 0;
 int32_t signal2_checker = 0;
+int32_t signal2_checker_teb = 0;
 bool e_stop_flag = false;
 bool release_flag = false;
 bool once_flag = false;
@@ -61,6 +64,9 @@ void update_scan(const sensor_msgs::LaserScan& input_scan)
         if(input_scan.ranges[i] < signal_distance) {
           signal_checker++;
         }
+	if(input_scan.ranges[i] < signal_distance_teb) {
+         signal_checker_teb++;
+        }
         ran_arr[i]=input_scan.ranges[i];
       }
 
@@ -68,22 +74,31 @@ void update_scan(const sensor_msgs::LaserScan& input_scan)
         if(input_scan.ranges[i] < signal_distance) {
           signal_checker++;
         }
+	if(input_scan.ranges[i] < signal_distance_teb) {
+	  signal_checker_teb++;
+	}
         if (signal_checker >= 30) {
           signal_checker = 30;
           //ROS_INFO("Emergency_Safety_LiDAR Detection!!!!!!!!!!!!!!!!!!!!");
         }
+	if (signal_checker_teb >= 30) {
+	  signal_checker_teb = 30;
+	}
         ran_arr[(i+(4*int(floor(deg_15))))-(input_scan.ranges.size()-1 - 4*int(floor(deg_15)))]=input_scan.ranges[i];
       }      
       for (unsigned int i = 0; i < 8*int(floor(deg_15))-1; i++) {
         if (ran_arr[i] >= signal_release) {
           signal2_checker++;
+	  signal2_checker_teb++;
         }
       }
       if (signal2_checker >= 8*int(floor(deg_15))-2) {
         signal2_checker =0;
         signal_checker = 0;
+	signal2_checker_teb = 0;
+	signal_checker_teb = 0;
       }
-      else if (signal2_checker < 8*int(floor(deg_15))-2) signal2_checker = 0;
+      else if (signal2_checker < 8*int(floor(deg_15))-2) { signal2_checker = 0; signal2_checker_teb = 0; }
       
       delete [] ran_arr;
      }
@@ -106,6 +121,7 @@ int main(int argc, char** argv)
     ros::Publisher cmd_e_vel_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel", 100);
     ros::Publisher monitor_pub = nh.advertise<md::monitor_msg>("monitor_topic", 100);   //Publisher declaration.
     ros::Publisher string_pub = nh.advertise<std_msgs::String>("string_com_topic", 100);
+    ros::Publisher fobstacle_pub = nh.advertise<std_msgs::Bool>("front_obstacle", 10);
 
     md::monitor_msg monitor;                                                            //monitor_msg declares message 'message' as message file.
 
@@ -388,6 +404,16 @@ int main(int argc, char** argv)
                 }
             }
         }
+	if (signal_checker_teb >= 30)  {
+	  std_msgs::Bool fobstacle_flag;
+	  fobstacle_flag.data = true;
+	  fobstacle_pub.publish(fobstacle_flag);
+	}
+	else  {
+	  std_msgs::Bool fobstacle_flag;
+	  fobstacle_flag.data = false;
+	  fobstacle_pub.publish(fobstacle_flag);
+	}
         if (signal_checker >= 30 && e_stop_flag ==false) {
             actionlib_msgs::GoalID empty_goal;
             geometry_msgs::Twist cmd_e_vel_msg;
